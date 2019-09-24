@@ -20,9 +20,10 @@
     "url": "https://github.com/nanitkatipunan/heroku-node-sample/issues"
   },
   "homepage": "https://github.com/nanitkatipunan/heroku-node-sample#readme",
-  "engines":{
-    "node":"10.15"
-    
-  }}
-  
-
+  "engines": {
+    "node": "10.15"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
