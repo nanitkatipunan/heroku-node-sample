@@ -14,12 +14,20 @@ io.on('connection', socket => {
     io.emit('chatmessage', msg);
   })
 
-  socket.on('newuser', function(name){
-    socket.broadcast.emit('newuser', name);
-  })
+  // socket.on('newuser', function(name){
+  //   socket.broadcast.emit('newuser', name);
+  // })
 
   socket.on('newuser', function(name){
-    socket.emit('newuser', name);
+
+    io.emit('newuser', name);
+  })
+
+  socket.on('typing', function(name){
+    io.emit('typing', name);
+  })
+  socket.on('stoptyping', function(name){
+    io.emit('stoptyping', name);
   })
 
   socket.on('userconnected', function(name){

@@ -23,10 +23,6 @@
     background-size: cover;
   }
 
-  
-
- 
-
   #messages {
     list-style-type: none;
     margin: 0;
@@ -86,16 +82,31 @@
     background-repeat: no-repeat;
     background-size: cover; /* Resize the background image to cover the entire container */
     border: 4px dotted blue;
+    height: 600px;
+    /*overflow-y: scroll;*/
 
   }
 
 #heade{
-  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsPb-gf1fX0jATQSmDVQ4Gj4757wvS1dNYS3WuWupn0ylqs5UM");
+  background-color: black;
   color:cyan;
 }
 
 #he{
   font-size:32px;
+}
+#message-container{
+  overflow-y: scroll;
+  height: 500px;
+}
+::-webkit-scrollbar {
+    width: 0px;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+}
+
+#istyping{
+  color:green;
+  margin-top: -50px;
 }
 
   
@@ -106,7 +117,9 @@
 
 
   <div id='heade' class="jumbotron text-center">
-   <b> <h1 id ="he">Welcome to Messenger</h1></b>
+    <b>
+      <h1 id="he">Welcome to Messenger</h1>
+    </b>
     <p>Find someone to chat now!</p>
   </div>
 
@@ -124,29 +137,19 @@
     </div>
     <div class="col-sm-6">
       <div class="card">
-        <div id = "second" class="card-body">
+        <div id="second" class="card-body">
           <center>
             </cente><a href="#" class="btn btn-primary">Chat Here</a></center>
           <br> <br>
-          <div id='message-container'>
-          </div>
-          <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-          <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-          <br><br><br><br><br><br>
-          <br><br>
-          <br><br>
-          <br><br>
-          <br><br>
-
-
-          <form id='send-container'>
-            <div class="input-group">
-              <button  id='send-button' type="button" class="btn btn-primary">Send Message</button>
-              <input id="message-input"autocomplete="off" type="text" class="form-control" name="msg" placeholder="Input Message">
-            </div>
-          </form>
-         
+          <div id='message-container'></div>
+          <p id="istyping"></p>
         </div>
+        <form id='send-container'>
+          <div class="input-group">
+            <button id='send-button' type="submit" class="btn btn-primary">Send Message</button>
+            <input id="message-input" autocomplete="off" type="text" class="form-control" name="msg" placeholder="Input Message">
+          </div>
+        </form>
       </div>
     </div>
 
@@ -173,7 +176,7 @@
       const messageContainer = document.getElementById('message-container')
       const UserContainer = document.getElementById('online')
       const users = [];
-      
+
 
 
 
@@ -191,12 +194,28 @@
         appendMessage(data.name + ' :' + ' connected');
       })
 
+      messageInput.onkeyup = function () {
+        socket.emit('typing', { name: namei });
+      }
+
+      socket.on('typing', data => {
+        if (data.name != namei) {
+          $("#istyping").text(data.name + " is typing ...")
+        }
+      })
+
+      socket.on('stoptyping', data => {
+        $("#istyping").empty();
+      })
+
 
       socket.on('chatmessage', data => {
         if (data.name == namei) {
           appendMessage(data.msg, "right");
+          $("#message-container").scrollTop($("#message-container")[0].scrollHeight);
         } else {
           appendMessage(data.name + ": " + data.msg, "left");
+          $("#message-container").scrollTop($("#message-container")[0].scrollHeight);
         }
 
       })
@@ -204,13 +223,15 @@
       $('form').submit(function (e) {
         e.preventDefault()
         const message = messageInput.value
-        $('#message-input').val('typing ........');
+        //$('#message-input').val('typing ........');
         socket.emit('chatmessage', { name: namei, msg: message });
+        //$("#istyping").text("")
+        socket.emit('stoptyping', { name: namei });
         $('#message-input').val('');
         return false;
       })
 
-      
+
 
 
 
